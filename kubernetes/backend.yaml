@@ -18,11 +18,8 @@ spec:
     spec:
       containers:
         - name: backend
-<<<<<<< HEAD
           image: prasad3737/wanderlust-backend-beta:v3
-=======
-          image: prasad3737/wanderlust-backend-beta:v3
->>>>>>> 3749b64 (Update backend to v3 and frontend to v2)
+
           ports:
             - containerPort: 8080
 ---
