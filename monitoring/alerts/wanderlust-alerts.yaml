@@ -1,0 +1,65 @@
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  name: wanderlust-application-alerts
+  namespace: monitoring
+  labels:
+    release: monitoring
+spec:
+  groups:
+  - name: wanderlust.rules
+
+    rules:
+
+    - alert: WanderlustBackendDown
+      expr: kube_pod_status_phase{
+              namespace="wanderlust",
+              pod=~"backend.*",
+              phase!="Running"
+            } == 1
+      for: 2m
+      labels:
+        severity: critical
+      annotations:
+        summary: "Wanderlust backend pod is down"
+        description: "Backend pod is not running for more than 2 minutes"
+
+
+    - alert: WanderlustFrontendDown
+      expr: kube_pod_status_phase{
+              namespace="wanderlust",
+              pod=~"frontend.*",
+              phase!="Running"
+            } == 1
+      for: 2m
+      labels:
+        severity: warning
+      annotations:
+        summary: "Wanderlust frontend pod is down"
+        description: "Frontend pod is not running"
+
+
+    - alert: WanderlustMongoRestarting
+      expr: increase(kube_pod_container_status_restarts_total{
+              namespace="wanderlust",
+              pod=~"mongo.*"
+            }[15m]) > 3
+      for: 2m
+      labels:
+        severity: warning
+      annotations:
+        summary: "MongoDB restarting frequently"
+        description: "MongoDB restarted more than 3 times in 15 minutes"
+
+
+    - alert: WanderlustRedisRestarting
+      expr: increase(kube_pod_container_status_restarts_total{
+              namespace="wanderlust",
+              pod=~"redis.*"
+            }[15m]) > 3
+      for: 2m
+      labels:
+        severity: warning
+      annotations:
+        summary: "Redis restarting frequently"
+        description: "Redis restarted more than 3 times in 15 minutes"
